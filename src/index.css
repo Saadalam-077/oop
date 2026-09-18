@@ -1,0 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* { scrollbar-width: thin; scrollbar-color: #475569 #1e293b; }
+body { font-family: 'Inter', 'Noto Sans Arabic', sans-serif; }
+.font-arabic { font-family: 'Noto Sans Arabic', sans-serif; }
