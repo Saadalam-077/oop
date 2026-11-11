@@ -14,7 +14,7 @@ const RecoveryPage = ({ onRecover, onNavigate }) => {
     setError('');
     setSuccess('');
     if (!/^\d{8}$/.test(studentNumber)) return setError('Student number must be 8 digits | الرقم الجامعي يجب أن يتكون من 8 أرقام');
-    if (recoveryCode.trim().length < 20) return setError('Enter the recovery code | أدخل رمز الاستعادة');
+    if (!recoveryCode.trim()) return setError('Enter the recovery code | أدخل رمز الاستعادة');
     if (password.length < 8) return setError('Password must be at least 8 characters | كلمة المرور يجب ألا تقل عن 8 أحرف');
     if (password !== confirmPassword) return setError('Passwords do not match | كلمتا المرور غير متطابقتين');
 
@@ -42,7 +42,7 @@ const RecoveryPage = ({ onRecover, onNavigate }) => {
           <div className="w-16 h-16 bg-violet-600 rounded-xl flex items-center justify-center mx-auto mb-4"><span className="text-white font-black text-xl">OOP</span></div>
           <h1 className="text-2xl font-bold text-white">Reset Password</h1>
           <p className="text-violet-300/70 font-arabic">استعادة كلمة المرور</p>
-          <p className="text-slate-400 text-sm mt-3">Use your student number and your one-time recovery code.</p>
+          <p className="text-slate-400 text-sm mt-3">Use your student number and the recovery code.</p>
           <p className="text-slate-400 text-sm font-arabic">أدخل رقمك الجامعي ورمز الاستعادة المخصص لك.</p>
         </div>
 
@@ -55,7 +55,7 @@ const RecoveryPage = ({ onRecover, onNavigate }) => {
           </div>
           <div>
             <label className="block text-slate-300 text-sm mb-2">Recovery Code | رمز الاستعادة</label>
-            <input value={recoveryCode} onChange={e => setRecoveryCode(e.target.value.replace(/\s/g, ''))} autoComplete="off" required disabled={loading} className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-violet-500 font-mono" placeholder="Your one-time code" />
+            <input value={recoveryCode} onChange={e => setRecoveryCode(e.target.value.replace(/\s/g, ''))} autoComplete="off" required disabled={loading} className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-violet-500 font-mono" placeholder="Recovery code" />
           </div>
           <div>
             <label className="block text-slate-300 text-sm mb-2">New Password | كلمة المرور الجديدة</label>
