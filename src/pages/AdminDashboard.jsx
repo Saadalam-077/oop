@@ -10,7 +10,7 @@ const AdminDashboard = ({ onLogout }) => {
 
   const fetchStudents = async () => {
     setLoading(true);
-    const { data, error } = await supabase.from('oop_students').select('*').order('student_name');
+    const { data, error } = await supabase.from('oop_students').select('id, student_name, student_number, section_number, progress').order('student_name');
     if (!error && data) setStudents(data);
     setLoading(false);
   };
