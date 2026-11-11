@@ -117,7 +117,7 @@ security definer
 set search_path = public, extensions
 as $$
 declare
-  v_student_id uuid;
+  v_student_id public.oop_students.id%type;
 begin
   if p_student_number is null
      or p_recovery_code is null
