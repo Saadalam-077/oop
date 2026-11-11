@@ -55,6 +55,10 @@ const LoginPage = ({ onLogin, onNavigate }) => {
           </button>
         </form>
 
+        <p className="text-center mt-4">
+          <button type="button" onClick={() => onNavigate('recover')} className="text-violet-400 hover:underline text-sm">Forgot password? | نسيت كلمة المرور؟</button>
+        </p>
+
         <p className="text-center text-slate-400 mt-6">
           Don't have an account? <button onClick={() => onNavigate('register')} className="text-violet-400 hover:underline">Register</button>
         </p>

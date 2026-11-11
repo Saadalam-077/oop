@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
 import LoginPage from './pages/LoginPage';
+import RecoveryPage from './pages/RecoveryPage';
 import RegisterPage from './pages/RegisterPage';
 import HomePage from './pages/HomePage';
 import ProfilePage from './pages/ProfilePage';
@@ -54,14 +55,11 @@ function App() {
     }
 
     try {
-      const { data, error } = await supabase
-        .from('oop_students')
-        .select('*')
-        .eq('student_number', studentNumber)
-        .eq('password', password)
-        .single();
-
-      if (error || !data) return false;
+      const { data, error } = await supabase.rpc('student_login', {
+        p_student_number: studentNumber.trim(),
+        p_password: password
+      });
+      if (error || !data?.success) return false;
 
       const progress = data.progress || {};
       const { grade, avg } = calculateGrade(progress);
@@ -70,7 +68,7 @@ function App() {
         studentName: data.student_name,
         studentNumber: data.student_number,
         sectionNumber: data.section_number,
-        progress: progress,
+        progress,
         overallGrade: grade,
         totalScore: avg
       };
@@ -84,36 +82,36 @@ function App() {
     }
   };
 
+  const handlePasswordRecovery = async (studentNumber, recoveryCode, newPassword) => {
+    const { data, error } = await supabase.rpc('reset_student_password', {
+      p_student_number: studentNumber.trim(),
+      p_recovery_code: recoveryCode.trim(),
+      p_new_password: newPassword
+    });
+    if (error) {
+      console.error('Password recovery error:', error);
+      return false;
+    }
+    return data === true || data?.success === true;
+  };
+
   const handleRegister = async (formData) => {
     try {
-      const { data: existing } = await supabase
-        .from('oop_students')
-        .select('id')
-        .eq('student_number', formData.studentNumber)
-        .single();
+      const { data, error } = await supabase.rpc('register_student', {
+        p_student_name: formData.studentName.trim(),
+        p_student_number: formData.studentNumber.trim(),
+        p_section_number: formData.sectionNumber,
+        p_password: formData.password
+      });
+      if (error || !data?.success) return false;
 
-      if (existing) return false;
-
-      const { data, error } = await supabase
-        .from('oop_students')
-        .insert([{
-          student_name: formData.studentName,
-          student_number: formData.studentNumber,
-          section_number: formData.sectionNumber,
-          password: formData.password,
-          progress: {}
-        }])
-        .select()
-        .single();
-
-      if (error) return false;
-
+      const student = data.student;
       const userData = {
-        id: data.id,
-        studentName: data.student_name,
-        studentNumber: data.student_number,
-        sectionNumber: data.section_number,
-        progress: {},
+        id: student.id,
+        studentName: student.student_name,
+        studentNumber: student.student_number,
+        sectionNumber: student.section_number,
+        progress: student.progress || {},
         overallGrade: 'N/A',
         totalScore: 0
       };
@@ -171,6 +169,7 @@ function App() {
 
   if (currentPage === 'login') return <LoginPage onLogin={handleLogin} onNavigate={handleNavigate} />;
   if (currentPage === 'register') return <RegisterPage onRegister={handleRegister} onNavigate={handleNavigate} />;
+  if (currentPage === 'recover') return <RecoveryPage onRecover={handlePasswordRecovery} onNavigate={handleNavigate} />;
   if (currentPage === 'admin' && user?.isAdmin) return <AdminDashboard onLogout={handleLogout} />;
   if (currentPage === 'home' && user) return <HomePage user={user} onNavigate={handleNavigate} onLogout={handleLogout} />;
   if (currentPage === 'profile' && user) return <ProfilePage user={user} onNavigate={handleNavigate} onLogout={handleLogout} />;
